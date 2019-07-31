@@ -1,0 +1,84 @@
+\documentclass{article}
+\usepackage{geometry}
+\geometry{portrait, margin=1in}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amsthm} % Math
+\usepackage{amsfonts}
+\usepackage{tikz}
+\usepackage{graphicx} % takes care of graphic including machinery
+\usepackage{tabularx} 
+\usepackage{tikz} 
+\usetikzlibrary{matrix,positioning}
+\setlength{\parindent}{0em}
+\tikzset{bullet/.style={circle,fill,inner sep=2pt}}
+
+
+
+\begin{document}
+\title{Option Pricing 101}
+\date{}
+\maketitle
+
+
+\section{One-Period Binomial Tree}
+We start will the simplest one-period binomial tree model, which assumes the stock price can take on two values in one period of time. Assume that the stock is currently trading at \$100 and the two possible outcome for the next period is \$120 and \$80 with equal probability. We have a one-period call option with strike price \$100. We also assume the interest rate is 0\% for simplicity.
+\begin{center}
+    
+
+\begin{tikzpicture}[>=stealth,sloped]
+    \matrix (tree) [%
+      matrix of nodes,
+      minimum size=1cm,
+      column sep=3.5cm,
+      row sep=1cm,nodes={text width=9em}
+          ]
+    {
+          &   &  \\
+          & {Stock price =\$110\\ Option Payoff=\$10} &   \\
+     Stock price = \$100 &   &  \\
+          &  {Stock price =\$85\\ Option Payoff =\$0} &   \\
+          &   &  \\
+    };
+    \node[bullet,right=0mm of tree-3-1.east](b-3-1){};
+    \node[bullet,left=0mm of tree-2-2.west](b-2-2){};
+    \node[bullet,left=0mm of tree-4-2.west](b-4-2){};
+    \draw[->] (b-3-1) -- (b-2-2) node [midway,above] {$p$};
+    \draw[->] (b-3-1) -- (b-4-2) node [midway,below] {$(1-p)$};
+  \end{tikzpicture}
+\end{center}
+
+It is very tempting to conclude that the option price is $$0.5\cdot 10 + 0.5 \cdot 0 = 5$$ given the probability and the option payoff in both scenarios. We defer the justification of why this calculation is incorrect after the discussion of the following portfolio.\\
+
+We are interested in constructing a portfolio of stocks and bonds(face value \$100) to replicate the payoff of a single call option. Is that possible? Suppose we want $x$ share of stocks and $y$ shares of bonds. The portfolio needs to satisfy the following constraints:
+\begin{align*} 
+110x + 100y &=  10 \\ 
+85x + 100y &=  0
+\end{align*}
+Solving the system, we get $x = 0.4$ and $y = -0.34$, which means by longing $0.4$ share of the stock and shorting $0.34$ share of bond, we successfully construct a replicating portfolio which \textbf{replicates} the payoff of a call option. By no-arbitrage law, the set-up cost of the replicating portfolio should be exactly the same as the price of a call option. The portfolio costs $0.4\cdot 100 - 0.34*100 = 6$ to set up.\\
+
+The question is, why does the call option only cost \$6 in which the expected payoff is actually \$10. The intuitive explanation behind this is that since the price movement of the underlying security is asymmetric, i.e. downside is bigger than the upside (from a long stock perspective, the expected payoff is $0.5\cdot 10 + 0.5\cdot (-15) = -2.5$). The option buyer would request to pay a lower price than the expected payoff from the option position.\\
+
+\textbf{Exercises}
+\begin{enumerate}
+    \item What would be the expected payoff and the option price if the stock price will be \$120 and \$ 80 respectively? What about \$120 and \$90? What can you conclude by comparing the three cases?
+\end{enumerate}
+
+\section{Risk Neutral Probabilities}
+Since the option price can be different from the expected payoff from the option position, a new probability measure is introduced - \textbf{Risk-Neutral Probability}. In our previous example, the risk neutral probability is the probability measure that equates the expected payoff and the option price.\\
+
+To find the risk-neutral probability, we consider a more generic case where the two possible outcomes at $T=1$ are $uS$ and $dS$ where $S$ is the current stock price and $u$ and $d$ are up/down factor respectively. We denote the risk-neutral up probability to be $\hat{p}$.\\
+
+First, we need to find the option price through the replicating portfolio.
+\begin{align*}
+    xuS + yB_T &= (u-1)S\\
+    xdS + yB_T &= 0
+\end{align*}
+Solving the system above, we get $x = \frac{(u-1)}{(u-d)}$ and $y = -
+\frac{(u-1)dS}{(u-d)B_T}$. Hence the set-up cost of the replicating portfolio is $$xS + y B_0 = \frac{u-1}{u-d}S - \frac{(u-1)dS}{(u-d)(1+r)} = \frac{(u-1) (1+r-d)S}{(u-d)(1+r)}$$
+
+Now we can solve for the risk neutral probabilities by equating the future value of the option with the expected payoff. $$\hat{p}(u-1)S + (1-\hat{p})0 = (1+r)\cdot \frac{(u-1) (1+r-d)S}{(u-d)(1+r)}$$
+and we get $\hat{p} = \frac{1+r-d}{u-d}$. Note that there is not direct relationship between the actual probabilities and the risk-neutral probabilities.
+\section{Black-Scholes Equation}
+\
+
+\end{document}
